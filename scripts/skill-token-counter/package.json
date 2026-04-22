@@ -4,10 +4,14 @@
   "description": "Calculates the token footprint of an agent skill using the Gemini API.",
   "main": "index.js",
   "scripts": {
-    "count": "node index.js"
+    "count": "node index.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
   },
   "type": "module"
 }
