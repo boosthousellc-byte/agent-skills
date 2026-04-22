@@ -60,10 +60,20 @@ _make_skill() {
     [ -f "$WORK_DIR/firebase-skills/skills/my-skill/SKILL.md" ]
 }
 
-@test "injects genkit-managed into destination SKILL.md" {
+@test "sets genkit-managed to true in destination SKILL.md" {
     _make_skill "my-skill"
     bash "$SCRIPT"
-    grep -q 'genkit-managed' "$WORK_DIR/firebase-skills/skills/my-skill/SKILL.md"
+    dest_skill="$WORK_DIR/firebase-skills/skills/my-skill/SKILL.md"
+    frontmatter=$(awk '/^---/{count++; next} count==1' "$dest_skill")
+    echo "$frontmatter" | grep -q 'genkit-managed: true'
+}
+
+@test "genkit-managed is injected into frontmatter not into the body" {
+    _make_skill "my-skill"
+    bash "$SCRIPT"
+    dest_skill="$WORK_DIR/firebase-skills/skills/my-skill/SKILL.md"
+    body=$(awk '/^---/{count++; next} count>=2' "$dest_skill")
+    [[ "$body" != *"genkit-managed"* ]]
 }
 
 @test "removes stale files from destination before syncing" {
