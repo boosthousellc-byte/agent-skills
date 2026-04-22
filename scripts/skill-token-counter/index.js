@@ -1,17 +1,16 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  console.error('Error: GEMINI_API_KEY environment variable is missing.');
-  process.exit(1);
-}
-
 const modelName = "gemini-3.1-pro-preview";
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: modelName });
+const apiKey = process.env.GEMINI_API_KEY;
+let model = null;
+if (apiKey) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  model = genAI.getGenerativeModel({ model: modelName });
+}
 
 async function countTokens(text) {
   if (!text || text.trim().length === 0) return 0;
@@ -24,7 +23,7 @@ async function countTokens(text) {
   }
 }
 
-function parseSkillMd(content) {
+export function parseSkillMd(content) {
   const frontmatterRegex = /^---\n([\s\S]*?)\n---\n/;
   const match = content.match(frontmatterRegex);
 
@@ -170,6 +169,11 @@ async function analyzeSkill(skillFolderPath, ref = null, gitHelper = null) {
 }
 
 async function main() {
+  if (!model) {
+    console.error('Error: GEMINI_API_KEY environment variable is missing.');
+    process.exit(1);
+  }
+
   const args = process.argv.slice(2);
   let compareRef = null;
   let isJson = false;
@@ -360,4 +364,6 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(console.error);
+}
