@@ -37,7 +37,7 @@ export function parseSkillMd(content) {
   }
 }
 
-async function listFilesRecursiveLocal(dir) {
+export async function listFilesRecursiveLocal(dir) {
   let results = [];
   try {
     const list = fs.readdirSync(dir);
@@ -152,9 +152,13 @@ async function analyzeSkill(skillFolderPath, ref = null, gitHelper = null) {
     }
   }
 
-  // 2. Process references
+  // 2. Process references — support both 'references' and 'reference' directory names
   const referencesPath = path.join(skillFolderPath, 'references');
-  const referenceFiles = await getRefFiles(referencesPath);
+  const referenceFallbackPath = path.join(skillFolderPath, 'reference');
+  let referenceFiles = await getRefFiles(referencesPath);
+  if (referenceFiles.length === 0) {
+    referenceFiles = await getRefFiles(referenceFallbackPath);
+  }
   for (const refFile of referenceFiles) {
     const relativePath = path.relative(skillFolderPath, refFile);
     const fileContent = getFile(refFile);
