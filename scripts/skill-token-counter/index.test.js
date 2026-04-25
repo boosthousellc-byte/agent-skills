@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { parseSkillMd } from './index.js';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { describe, it, expect, afterEach } from 'vitest';
+import { parseSkillMd, listFilesRecursiveLocal } from './index.js';
 
 describe('parseSkillMd', () => {
   it('splits valid frontmatter and body', () => {
@@ -69,5 +72,59 @@ describe('parseSkillMd', () => {
     const content = '---\nname: test\n---\n# Body\nwith multiple\nlines';
     const { frontmatter, body } = parseSkillMd(content);
     expect(frontmatter + body).toBe(content);
+  });
+});
+
+describe('listFilesRecursiveLocal', () => {
+  let tmpDir;
+
+  afterEach(() => {
+    if (tmpDir && fs.existsSync(tmpDir)) {
+      fs.rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it('returns empty array for a non-existent directory', async () => {
+    const files = await listFilesRecursiveLocal('/nonexistent/path/that/does/not/exist');
+    expect(files).toEqual([]);
+  });
+
+  it('returns files from an existing directory', async () => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-test-'));
+    fs.writeFileSync(path.join(tmpDir, 'a.md'), 'content a');
+    fs.writeFileSync(path.join(tmpDir, 'b.md'), 'content b');
+
+    const files = await listFilesRecursiveLocal(tmpDir);
+    expect(files.sort()).toEqual([
+      path.join(tmpDir, 'a.md'),
+      path.join(tmpDir, 'b.md'),
+    ]);
+  });
+
+  it('recurses into subdirectories', async () => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-test-'));
+    const sub = path.join(tmpDir, 'sub');
+    fs.mkdirSync(sub);
+    fs.writeFileSync(path.join(tmpDir, 'top.md'), 'top');
+    fs.writeFileSync(path.join(sub, 'nested.md'), 'nested');
+
+    const files = await listFilesRecursiveLocal(tmpDir);
+    expect(files.sort()).toEqual([
+      path.join(sub, 'nested.md'),
+      path.join(tmpDir, 'top.md'),
+    ]);
+  });
+
+  it('returns empty array for a "references" dir that does not exist, enabling fallback to "reference"', async () => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-test-'));
+    const referenceDir = path.join(tmpDir, 'reference');
+    fs.mkdirSync(referenceDir);
+    fs.writeFileSync(path.join(referenceDir, 'ops.md'), 'ops content');
+
+    const fromReferences = await listFilesRecursiveLocal(path.join(tmpDir, 'references'));
+    expect(fromReferences).toEqual([]);
+
+    const fromReference = await listFilesRecursiveLocal(referenceDir);
+    expect(fromReference).toEqual([path.join(referenceDir, 'ops.md')]);
   });
 });
