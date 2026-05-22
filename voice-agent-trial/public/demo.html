@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your AI Phone Agent Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div class="demo-layout" id="demo-layout">
+
+  <!-- Top CTA bar -->
+  <div class="cta-bar">
+    <div class="cta-bar-left">
+      <div>
+        <div class="label">📞 Your AI Phone Agent</div>
+        <div class="phone-num" id="cta-phone">Loading…</div>
+      </div>
+      <div class="trained-on" id="cta-trained">Training on your website…</div>
+    </div>
+    <div class="cta-bar-right">
+      <a id="btn-call-link" href="tel:+10000000000" class="btn-call">
+        📞 Call Now &amp; Try It Live
+      </a>
+      <a href="/" class="btn-signup">Get Full Access →</a>
+    </div>
+  </div>
+
+  <!-- Demo info pill -->
+  <div class="demo-info" id="demo-info">
+    Demo for <span id="demo-company-name">your company</span> &nbsp;·&nbsp;
+    This call is recorded for demo purposes
+  </div>
+
+  <!-- Website iframe / fallback -->
+  <div class="site-frame-wrap">
+    <iframe
+      id="site-iframe"
+      class="site-iframe"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+      loading="lazy"
+    ></iframe>
+    <div class="site-fallback" id="site-fallback">
+      <img id="fallback-screenshot" src="" alt="Website preview" />
+      <div class="company-name" id="fallback-company"></div>
+      <div class="site-url" id="fallback-url"></div>
+      <p style="color:var(--muted);font-size:.85rem;max-width:320px">
+        This site can't be previewed in an iframe. Call the number above to try your AI agent!
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chatbot overlay widget -->
+<div class="chat-widget" id="chat-widget">
+  <div class="chat-bubble-container" id="chat-container">
+    <div class="chat-header">
+      <div class="avatar">🤖</div>
+      <div>
+        <div class="name">Aria — AI Receptionist</div>
+        <div class="status">
+          <span class="status-dot"></span>
+          Online · Trained on <span id="widget-company">your site</span>
+        </div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-bar">
+      <input
+        type="text"
+        id="chat-input"
+        placeholder="Type a message or call the number above…"
+        onkeydown="handleChatKey(event)"
+        disabled
+      />
+      <button class="btn-send" onclick="sendChatMessage()">➤</button>
+    </div>
+    <div class="chat-cta-footer">
+      🎯 To hear the full agent, <a id="footer-call-link" href="tel:+10000000000">call this number</a>
+    </div>
+  </div>
+
+  <button class="chat-toggle" id="chat-toggle" onclick="toggleChat()">
+    <span class="open-icon">💬</span>
+    <span class="close-icon">✕</span>
+  </button>
+</div>
+
+<script src="js/demo-widget.js"></script>
+</body>
+</html>

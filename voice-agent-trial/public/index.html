@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Phone Agent Trial — Built For Your Roofing Company</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div class="landing">
+  <div class="landing-badge">⚡ Free 30-Second Demo</div>
+
+  <h1>Your <span>AI Phone Agent</span><br>Answers Every Call,<br>Books Every Job</h1>
+
+  <p class="sub">
+    Enter your website below. We'll scrape your company info and build a live voice agent
+    trained on your business — fully qualified leads, scheduled inspections, and SMS confirmations.
+    All without you picking up the phone.
+  </p>
+
+  <div class="form-card">
+    <label for="website-url">Your Roofing Company Website</label>
+
+    <div class="form-row">
+      <input
+        type="url"
+        id="website-url"
+        placeholder="https://yourroof.com"
+        autocomplete="url"
+        required
+      />
+      <button class="btn" id="scrape-btn">
+        <span id="btn-text">Build My Agent →</span>
+      </button>
+    </div>
+
+    <div class="form-optional">
+      <div>
+        <label for="owner-phone">
+          Your Cell # <span class="optional-label">(optional — for lead alerts)</span>
+        </label>
+        <input type="tel" id="owner-phone" placeholder="+1 (555) 000-0000" />
+      </div>
+      <div>
+        <label for="calendly-url">
+          Calendly Link <span class="optional-label">(optional)</span>
+        </label>
+        <input type="url" id="calendly-url" placeholder="calendly.com/your-name" />
+      </div>
+    </div>
+
+    <button class="btn btn-full" id="submit-btn" onclick="startDemo()">
+      Build My Free AI Phone Agent →
+    </button>
+
+    <div class="error-msg" id="error-msg"></div>
+  </div>
+
+  <div class="trust-row">
+    <span>✅ No credit card required</span>
+    <span>✅ Live in under 60 seconds</span>
+    <span>✅ Powered by Vapi.ai</span>
+    <span>✅ Insurance & owner-pay qualified</span>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div class="loader-overlay" id="loader">
+  <div class="spinner"></div>
+  <strong id="loader-heading">Building your agent…</strong>
+  <ul class="loader-steps" id="loader-steps">
+    <li id="step-1">🔍 Scanning your website…</li>
+    <li id="step-2">🧠 Training agent on your company info…</li>
+    <li id="step-3">📞 Provisioning your demo phone number…</li>
+    <li id="step-4">🚀 Launching your demo page…</li>
+  </ul>
+</div>
+
+<script src="js/landing.js"></script>
+</body>
+</html>
