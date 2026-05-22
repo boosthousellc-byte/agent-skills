@@ -1,7 +1,7 @@
 'use strict';
 
 const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1'
+  ? 'http://127.0.0.1:5001/boosthouse-demo-portal/us-central1'
   : '/api';
 
 let demoData = null;

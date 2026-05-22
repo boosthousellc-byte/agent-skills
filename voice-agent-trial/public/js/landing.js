@@ -3,7 +3,7 @@
 // Points to deployed Firebase Cloud Function URL.
 // Replaced at deploy time via firebase.json rewrites or env config.
 const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://127.0.0.1:5001/YOUR_PROJECT_ID/us-central1'
+  ? 'http://127.0.0.1:5001/boosthouse-demo-portal/us-central1'
   : '/api';
 
 const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
