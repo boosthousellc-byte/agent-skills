@@ -10,6 +10,19 @@ const { handleVapiWebhook } = require('./webhookHandler');
 admin.initializeApp();
 const db = admin.firestore();
 
+// Bridge firebase functions:config:set values into process.env so the rest of
+// the code can use process.env regardless of how config was supplied.
+const cfg = functions.config();
+if (cfg.vapi) {
+  process.env.VAPI_API_KEY         = process.env.VAPI_API_KEY         || cfg.vapi.api_key;
+  process.env.VAPI_PHONE_NUMBER_ID = process.env.VAPI_PHONE_NUMBER_ID || cfg.vapi.phone_number_id;
+  process.env.VAPI_DEMO_OWNER_PHONE = process.env.VAPI_DEMO_OWNER_PHONE || cfg.vapi.demo_owner_phone;
+  process.env.VAPI_WEBHOOK_SECRET  = process.env.VAPI_WEBHOOK_SECRET  || cfg.vapi.webhook_secret;
+}
+if (cfg.calendly) {
+  process.env.CALENDLY_DEFAULT_URL = process.env.CALENDLY_DEFAULT_URL || cfg.calendly.default_url;
+}
+
 // ── CORS helper ───────────────────────────────────────────────────────────────
 
 function setCors(res) {
