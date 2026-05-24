@@ -1,7 +1,6 @@
 'use strict';
 
 const fetch = require('node-fetch');
-
 const VAPI_API_URL = 'https://api.vapi.ai';
 
 function headers() {
@@ -11,9 +10,7 @@ function headers() {
   };
 }
 
-// ── Assistant ─────────────────────────────────────────────────────────────────
-
-async function createAssistant({ companyName, serviceArea, services, tagline, webhookUrl, calendlyUrl }) {
+async function createAssistant({ companyName, serviceArea, services, tagline, webhookUrl, calendlyUrl, ownerPhone, websiteUrl, displayPhone }) {
   const serviceList = services.length
     ? services.slice(0, 6).join(', ')
     : 'roofing, siding, gutters, storm damage restoration';
@@ -45,7 +42,6 @@ RULES:
 - Keep each response to 1-2 sentences maximum
 - Ask only one question per turn
 - Never discuss pricing or specific costs on the call
-- If asked about insurance supplements or supplements, say: "Our estimators are experts at working with insurance adjusters — we'll go over that at your inspection."
 - Always be warm, empathetic, and professional
 - If you cannot answer something, say: "That's a great question — our team will cover that at your free inspection."`;
 
@@ -68,11 +64,18 @@ RULES:
       language: 'en-US',
     },
     serverUrl: webhookUrl,
-    serverUrlSecret: process.env.VAPI_WEBHOOK_SECRET || undefined,
     endCallPhrases: ['goodbye', 'bye bye', 'have a good day', 'talk to you later'],
     recordingEnabled: true,
-    hipaaEnabled: false,
-    metadata: { type: 'demo' },
+    // Store all demo data here — no database needed
+    metadata: {
+      type: 'demo',
+      companyName,
+      websiteUrl,
+      serviceArea,
+      ownerPhone:  ownerPhone  || null,
+      calendlyUrl: calendlyUrl || null,
+      phoneNumber: displayPhone,
+    },
   };
 
   const res = await fetch(`${VAPI_API_URL}/assistant`, {
@@ -85,23 +88,17 @@ RULES:
     const err = await res.text();
     throw new Error(`Vapi createAssistant failed (${res.status}): ${err}`);
   }
-
   return res.json();
 }
 
-async function deleteAssistant(assistantId) {
-  await fetch(`${VAPI_API_URL}/assistant/${assistantId}`, {
-    method: 'DELETE',
-    headers: headers(),
-  });
+async function getAssistant(assistantId) {
+  const res = await fetch(`${VAPI_API_URL}/assistant/${assistantId}`, { headers: headers() });
+  if (!res.ok) throw new Error(`Vapi getAssistant failed (${res.status})`);
+  return res.json();
 }
 
-// ── Phone number ──────────────────────────────────────────────────────────────
-
 async function getPhoneNumber(phoneNumberId) {
-  const res = await fetch(`${VAPI_API_URL}/phone-number/${phoneNumberId}`, {
-    headers: headers(),
-  });
+  const res = await fetch(`${VAPI_API_URL}/phone-number/${phoneNumberId}`, { headers: headers() });
   if (!res.ok) throw new Error(`Vapi getPhoneNumber failed (${res.status})`);
   return res.json();
 }
@@ -119,20 +116,12 @@ async function assignAssistantToNumber(phoneNumberId, assistantId) {
   return res.json();
 }
 
-// ── SMS ───────────────────────────────────────────────────────────────────────
-
 async function sendSms({ phoneNumberId, to, message }) {
   const res = await fetch(`${VAPI_API_URL}/message`, {
     method: 'POST',
     headers: headers(),
-    body: JSON.stringify({
-      phoneNumberId,
-      type: 'outboundMessage',
-      to,
-      message,
-    }),
+    body: JSON.stringify({ phoneNumberId, type: 'outboundMessage', to, message }),
   });
-
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`Vapi sendSms failed (${res.status}): ${err}`);
@@ -140,19 +129,4 @@ async function sendSms({ phoneNumberId, to, message }) {
   return res.json();
 }
 
-// ── Calls ─────────────────────────────────────────────────────────────────────
-
-async function getCall(callId) {
-  const res = await fetch(`${VAPI_API_URL}/call/${callId}`, { headers: headers() });
-  if (!res.ok) throw new Error(`Vapi getCall failed (${res.status})`);
-  return res.json();
-}
-
-module.exports = {
-  createAssistant,
-  deleteAssistant,
-  getPhoneNumber,
-  assignAssistantToNumber,
-  sendSms,
-  getCall,
-};
+module.exports = { createAssistant, getAssistant, getPhoneNumber, assignAssistantToNumber, sendSms };

@@ -1,0 +1,18 @@
+[build]
+  base    = "voice-agent-trial"
+  publish = "public"
+  command = "echo 'No build step required'"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to   = "/.netlify/functions/:splat"
+  status = 200
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "max-age=3600"
